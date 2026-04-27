@@ -183,4 +183,7 @@ config file = /etc/ansible/ansible.cfg
 #module_lang    = C
 #module_set_locale = False
 
+---------
+
+ ansible all --list-hosts   -- list all ansible clients
 
