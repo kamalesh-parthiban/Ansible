@@ -1,0 +1,133 @@
+Ansible is a configuration management and automation tool — it automates repetitive tasks across multiple servers.
+
+Without Ansible:
+  SSH into server 1 → install nginx → configure
+  SSH into server 2 → install nginx → configure
+  SSH into server 3 → install nginx → configure
+  100 servers = 100 times ❌
+  Manual, slow, error prone ❌
+
+With Ansible:
+  Write one playbook
+        ↓
+  Run once
+        ↓
+  Ansible does it on ALL servers ✅
+  100 servers = same time ✅
+
+What Ansible does:
+
+✅ Install software on servers
+✅ Configure files
+✅ Start/stop services
+✅ Deploy applications
+✅ Manage users
+✅ Apply security patches
+✅ Setup K8s clusters
+✅ Configure cloud resources
+
+Ansible vs Terraform:
+
+Terraform: HCL (HashiCorp Configuration Language) 
+  Creates infrastructure
+  EC2, VPC, RDS, EKS
+  "Build the house"
+
+Ansible: YAML
+  Configures servers
+  Install software, manage files
+  "Furnish the house"
+
+Used together:
+  Terraform creates EC2 ✅
+  Ansible configures EC2 ✅
+
+How Ansible works:
+
+Your machine (Control node)
+    ↓
+Ansible reads playbook
+    ↓
+Connects via SSH (no agent needed!)
+    ↓
+Runs tasks on all servers
+    ↓
+Done ✅
+
+Key concepts:
+1. Inventory — list of servers:
+
+# hosts.ini
+[webservers]
+server1 ansible_host=10.0.1.10
+server2 ansible_host=10.0.1.11
+server3 ansible_host=10.0.1.12
+
+[dbservers]
+db1 ansible_host=10.0.2.10
+db2 ansible_host=10.0.2.11
+
+2. Playbook — what to do:
+
+# playbook.yml
+---
+- name: Install and start Nginx
+  hosts: webservers        # run on all webservers
+  become: yes              # sudo
+
+  tasks:
+    - name: Install nginx
+      yum:
+        name: nginx
+        state: present
+
+    - name: Start nginx
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+    - name: Copy config file
+      copy:
+        src: nginx.conf
+        dest: /etc/nginx/nginx.conf
+
+3. Modules — built-in commands:
+
+yum:        # install packages (RHEL/CentOS)
+apt:        # install packages (Ubuntu)
+service:    # manage services
+copy:       # copy files
+template:   # copy with variables
+user:       # manage users
+file:       # manage files/dirs
+command:    # run shell commands
+docker:     # manage Docker containers
+k8s:        # manage Kubernetes
+aws_ec2:    # manage AWS EC2
+
+4. Roles — reusable structure:
+
+roles/
+├── nginx/
+│   ├── tasks/
+│   │   └── main.yml
+│   ├── templates/
+│   │   └── nginx.conf.j2
+│   └── vars/
+│       └── main.yml
+
+Run playbook:
+
+# Run on all servers
+ansible-playbook -i hosts.ini playbook.yml
+
+# Run on specific server
+ansible-playbook -i hosts.ini playbook.yml \
+  --limit server1
+
+# Check what will happen (dry run)
+ansible-playbook -i hosts.ini playbook.yml \
+  --check
+
+
