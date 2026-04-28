@@ -195,4 +195,18 @@ ssh-keygen
 
 copy this public key to clients server
 
-ssh-copy-id ip
+ssh-copy-id ip    -- to copy to server
+
+# pwd
+/root
+
+# ls -a
+.ssh
+
+# cd .ssh
+
+# pwd
+/root/.ssh
+
+# ls
+authorized_keys
