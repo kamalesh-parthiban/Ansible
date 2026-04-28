@@ -1,0 +1,85 @@
+Syntax:
+
+ansible all -m MODULE -a "ARGUMENTS" -i inventory
+
+SYSTEM MODULES
+──────────────────────────────────────────────────────────
+
+ping        → Test connectivity
+              ansible all -m ping
+
+command     → Run command (no shell, no pipes)
+              ansible all -m command -a "uptime"
+
+shell       → Run via /bin/sh (supports pipes)
+              ansible all -m shell -a "df -h | grep /dev"
+
+raw         → No Python needed on target
+              ansible all -m raw -a "yum install python3 -y"
+
+reboot      → Reboot and wait for host to come back
+              ansible all -m reboot
+
+setup       → Gather all facts about host
+              ansible all -m setup
+
+
+FILE MODULES
+──────────────────────────────────────────────────────────
+
+copy        → Copy file to remote host
+              ansible all -m copy -a "src=/tmp/a.txt dest=/tmp/a.txt"
+
+fetch       → Pull file FROM remote to local
+              ansible all -m fetch -a "src=/var/log/app.log dest=/tmp/"
+
+file        → Create / delete / chmod / chown
+              ansible all -m file -a "path=/tmp/test state=directory"
+
+lineinfile  → Add or edit a line inside a file
+              ansible all -m lineinfile -a "path=/etc/hosts line='1.1.1.1 app'"
+
+stat        → Check if file exists, get file info
+              ansible all -m stat -a "path=/etc/nginx"
+
+
+PACKAGE / SERVICE MODULES
+──────────────────────────────────────────────────────────
+
+yum         → Install package on RHEL / Amazon Linux
+              ansible all -m yum -a "name=nginx state=present"
+
+apt         → Install package on Ubuntu / Debian
+              ansible all -m apt -a "name=nginx state=present"
+
+service     → Start / stop / restart a service
+              ansible all -m service -a "name=nginx state=started"
+
+user        → Create / delete system users
+              ansible all -m user -a "name=deploy state=present"
+
+cron        → Add / remove cron jobs
+              ansible all -m cron -a "name=backup minute=0 hour=2 job='/backup.sh'"
+
+
+COMMAND vs SHELL
+──────────────────────────────────────────────────────────
+
+command  →  no pipes   no redirects   no variables   ✅ safer
+shell    →  pipes ✅   redirects ✅   variables ✅   use when needed
+
+# FAILS  → ansible all -m command -a "df -h | grep /dev"
+# WORKS  → ansible all -m shell   -a "df -h | grep /dev"
+
+
+STATE VALUES (used in -a arguments)
+──────────────────────────────────────────────────────────
+
+state=present   → install / create
+state=absent    → remove / delete
+state=started   → start service
+state=stopped   → stop service
+state=restarted → restart service
+state=directory → create directory
+state=file      → ensure it is a file
+state=touch     → touch the file
