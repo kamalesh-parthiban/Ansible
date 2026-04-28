@@ -1,0 +1,100 @@
+AD-HOC
+──────────────────────────────────────────────────────────
+
+ansible all -m yum -a "name=nginx state=present"
+ansible all -m service -a "name=nginx state=started"
+ansible all -m copy -a "src=nginx.conf dest=/etc/nginx/"
+ansible all -m service -a "name=nginx state=restarted"
+
+Problems:
+  ✗ 4 separate commands to type
+  ✗ easy to forget a step
+  ✗ no way to save and reuse
+  ✗ no way to share with team
+  ✗ runs line by line manually
+  ✗ no error handling
+  ✗ no conditions / logic
+  ✗ cannot version control properly
+
+
+PLAYBOOK
+──────────────────────────────────────────────────────────
+
+- name: setup nginx
+  hosts: webservers
+  tasks:
+    - name: install nginx
+      yum:
+        name: nginx
+        state: present
+
+    - name: start nginx
+      service:
+        name: nginx
+        state: started
+
+    - name: copy config
+      copy:
+        src: nginx.conf
+        dest: /etc/nginx/
+
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+
+Benefits:
+  ✓ one command runs everything
+  ✓ saved as a file
+  ✓ reusable anytime
+  ✓ shareable with team
+  ✓ stored in git
+  ✓ error handling built in
+  ✓ conditions, loops, variables
+  ✓ self documenting
+
+
+REAL COMPARISON
+──────────────────────────────────────────────────────────
+
+Situation          Ad-hoc                    Playbook
+─────────────────────────────────────────────────────────
+quick check      ✅ perfect                 overkill
+install 1 pkg    ✅ fine                    overkill
+setup full app   ✗ too many commands        ✅ perfect
+repeat weekly    ✗ retype every time        ✅ just run file
+team shares      ✗ hard to document         ✅ commit to git
+100 servers      ✗ risky, error prone       ✅ consistent
+with conditions  ✗ not possible             ✅ when / until
+with loops       ✗ not possible             ✅ loop / with_items
+prod deploy      ✗ never do this            ✅ always use this
+
+
+WHEN TO USE WHAT
+──────────────────────────────────────────────────────────
+
+Ad-hoc  → one time tasks, quick checks, testing
+          ansible all -m ping
+          ansible all -m shell -a "df -h"
+          ansible all -m setup | grep os_family
+
+Playbook → everything else
+          setup servers
+          deploy applications
+          configure software
+          anything you repeat
+          anything production
+
+
+ONE LINE ANSWER FOR INTERVIEW
+──────────────────────────────────────────────────────────
+
+"Ad-hoc is like typing a command in terminal —
+ works once, gone forever.
+
+ Playbook is like writing a shell script —
+ saved, reusable, version controlled, and
+ shareable with the entire team.
+
+ We use ad-hoc only for quick checks.
+ Everything in production uses playbooks." ✅
