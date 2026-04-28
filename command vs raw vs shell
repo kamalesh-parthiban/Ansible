@@ -1,0 +1,79 @@
+SEMICOLON CHAINING
+──────────────────────────────────────────────────────────
+
+shell module
+ansible all -m shell -a "uname -a;free -m;hostname"
+✅ works perfectly — shell supports ; && ||
+
+command module
+ansible all -m command -a "uname -a;free -m;hostname"
+✗ FAILS — treats entire string as one command
+  error: "uname -a;free -m;hostname: command not found"
+
+raw module
+ansible all -m raw -a "uname -a;free -m;hostname"
+✅ works — raw sends directly to SSH shell
+
+
+WHY command FAILS
+──────────────────────────────────────────────────────────
+
+command module does NOT use /bin/sh
+it runs the command DIRECTLY on the OS
+
+so when you pass:
+  "uname -a;free -m;hostname"
+
+it looks for a binary literally named:
+  "uname -a;free -m;hostname"
+  → not found → error ✗
+
+
+WHY raw WORKS
+──────────────────────────────────────────────────────────
+
+raw module sends command directly over SSH
+SSH uses /bin/sh by default
+so ; and && work just like shell module
+
+raw also works when:
+  → Python is not installed on target
+  → bootstrapping fresh servers
+  → network devices (routers, switches)
+
+
+COMPARISON TABLE
+──────────────────────────────────────────────────────────
+
+Feature          shell     command     raw
+─────────────────────────────────────────────────
+uses /bin/sh     ✅ yes    ✗ no        ✅ yes
+supports ;       ✅ yes    ✗ no        ✅ yes
+supports &&      ✅ yes    ✗ no        ✅ yes
+supports pipes   ✅ yes    ✗ no        ✅ yes
+needs Python     ✅ yes    ✅ yes      ✗ no
+idempotent       ✅ yes    ✅ yes      ✗ no
+recommended      ✅ yes    ✅ yes      last resort
+
+
+WHEN TO USE WHAT
+──────────────────────────────────────────────────────────
+
+command  → single simple command, no pipes needed
+           ansible all -m command -a "uptime"
+
+shell    → multiple commands, pipes, variables
+           ansible all -m shell -a "df -h | grep /dev"
+
+raw      → target has no Python installed
+           ansible all -m raw -a "yum install python3 -y"
+
+
+INTERVIEW ONE-LINER
+──────────────────────────────────────────────────────────
+
+"command module does not invoke a shell so
+ semicolons and pipes are not supported.
+ shell and raw both work because they go
+ through /bin/sh. We use raw only when
+ Python is missing on the target node." ✅
