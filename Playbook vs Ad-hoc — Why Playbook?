@@ -98,3 +98,32 @@ ONE LINE ANSWER FOR INTERVIEW
 
  We use ad-hoc only for quick checks.
  Everything in production uses playbooks." ✅
+
+--------------------
+
+ORDER TO ALWAYS FOLLOW
+──────────────────────────────────────────────────────────
+
+Step 1 → syntax check first
+         ansible-playbook playbook.yml --syntax-check
+
+Step 2 → dry run to see what changes
+         ansible-playbook playbook.yml --check
+
+Step 3 → run on one host first
+         ansible-playbook playbook.yml --limit web1
+
+Step 4 → run on full group
+         ansible-playbook playbook.yml --limit webservers
+
+Step 5 → run on all
+         ansible-playbook playbook.yml
+
+
+INTERVIEW ONE-LINER
+──────────────────────────────────────────────────────────
+
+"We never run playbooks directly on production.
+ Always syntax-check first, then dry run with
+ --check, then limit to one host, then roll
+ out to full group. This prevents surprises." ✅
