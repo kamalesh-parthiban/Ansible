@@ -1,0 +1,85 @@
+WHAT IT DOES
+──────────────────────────────────────────────────────────
+
+ansible-doc -l
+
+Lists ALL available ansible modules installed
+on your control node
+
+output looks like:
+  amazon.aws.aws_az_facts           Gather facts about ec2
+  amazon.aws.ec2_instance           Create EC2 instances
+  ansible.builtin.apt               Manages apt packages
+  ansible.builtin.command           Execute commands
+  ansible.builtin.copy              Copy files to remote
+  ansible.builtin.file              Manage files
+  ansible.builtin.ping              Try to connect to host
+  ansible.builtin.shell             Execute shell commands
+  ansible.builtin.yum               Manages packages with yum
+  ... (thousands of modules)
+
+
+USEFUL ansible-doc COMMANDS
+──────────────────────────────────────────────────────────
+
+ansible-doc -l                    → list all modules
+ansible-doc -l | wc -l            → count total modules
+ansible-doc -l | grep aws         → filter aws modules only
+ansible-doc -l | grep docker      → filter docker modules
+ansible-doc -l | grep yum         → find yum related modules
+
+ansible-doc yum                   → full docs for yum module
+ansible-doc copy                  → full docs for copy module
+ansible-doc shell                 → full docs for shell module
+
+ansible-doc -s yum                → short snippet / example only
+ansible-doc -s copy               → short snippet for copy
+ansible-doc -s shell              → short snippet for shell
+
+
+EXAMPLE OUTPUT OF ansible-doc yum
+──────────────────────────────────────────────────────────
+
+> YUM    (/usr/lib/python3/dist-packages/ansible/modules/yum.py)
+
+  Installs, upgrade, downgrades, removes, and lists
+  packages and groups with the yum package manager.
+
+OPTIONS:
+  name        → package name (required)
+  state       → present / absent / latest
+  update_cache→ update yum cache before install
+
+
+EXAMPLE OUTPUT OF ansible-doc -s copy
+──────────────────────────────────────────────────────────
+
+- name: task name
+  copy:
+    src:          # local path
+    dest:         # remote path
+    owner:        # file owner
+    group:        # file group
+    mode:         # permissions eg 0644
+    backup:       # yes/no backup before overwrite
+
+
+WHY IT IS USEFUL
+──────────────────────────────────────────────────────────
+
+→ no internet needed
+→ works offline on server
+→ shows exact parameter names
+→ shows examples ready to copy
+→ faster than googling
+
+
+INTERVIEW TIP
+──────────────────────────────────────────────────────────
+
+"ansible-doc is the built-in offline manual
+ for all ansible modules. ansible-doc -l lists
+ everything available. ansible-doc -s gives
+ a ready to use snippet. I use this instead
+ of googling when working on servers
+ without internet access." ✅
