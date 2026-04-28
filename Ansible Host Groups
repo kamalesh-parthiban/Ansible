@@ -1,0 +1,100 @@
+INVENTORY FILE (inventory.ini)
+──────────────────────────────────────────────────────────
+
+[webservers]
+web1 ansible_host=192.168.1.10
+web2 ansible_host=192.168.1.11
+web3 ansible_host=192.168.1.12
+
+[dbservers]
+db1 ansible_host=192.168.1.20
+db2 ansible_host=192.168.1.21
+
+[appservers]
+app1 ansible_host=192.168.1.30
+app2 ansible_host=192.168.1.31
+
+
+GROUP VARIABLES (same inventory file)
+──────────────────────────────────────────────────────────
+
+[webservers:vars]
+ansible_user=ec2-user
+ansible_ssh_private_key_file=~/.ssh/web-key.pem
+
+[dbservers:vars]
+ansible_user=ubuntu
+ansible_ssh_private_key_file=~/.ssh/db-key.pem
+
+
+CHILDREN GROUP (group of groups)
+──────────────────────────────────────────────────────────
+
+[production:children]
+webservers
+dbservers
+appservers
+
+[staging:children]
+webservers
+dbservers
+
+
+REAL WORLD EXAMPLE (AWS EC2)
+──────────────────────────────────────────────────────────
+
+[webservers]
+web1 ansible_host=54.12.34.56  ansible_user=ec2-user
+web2 ansible_host=54.12.34.57  ansible_user=ec2-user
+
+[dbservers]
+db1  ansible_host=54.12.34.58  ansible_user=ubuntu
+
+[all:vars]
+ansible_ssh_private_key_file=~/.ssh/my-key.pem
+ansible_python_interpreter=/usr/bin/python3
+
+
+HOW TO TARGET GROUPS IN AD-HOC
+──────────────────────────────────────────────────────────
+
+ansible all          -m ping   # target ALL hosts
+ansible webservers   -m ping   # target webservers group only
+ansible dbservers    -m ping   # target dbservers group only
+ansible production   -m ping   # target production (all children)
+ansible web1         -m ping   # target single host
+
+
+HOW TO TARGET GROUPS IN PLAYBOOK
+──────────────────────────────────────────────────────────
+
+- name: deploy nginx
+  hosts: webservers        # ← group name here
+  tasks:
+    - name: install nginx
+      yum:
+        name: nginx
+        state: present
+
+- name: setup database
+  hosts: dbservers         # ← different group
+  tasks:
+    - name: install mysql
+      apt:
+        name: mysql-server
+        state: present
+
+
+SPECIAL GROUP NAMES
+──────────────────────────────────────────────────────────
+
+all        → every host in inventory
+ungrouped  → hosts not in any group
+
+
+CHECK YOUR GROUPS
+──────────────────────────────────────────────────────────
+
+ansible-inventory --list           # show all hosts and groups as JSON
+ansible-inventory --graph          # show group tree structure
+ansible webservers --list-hosts    # list hosts in a group
