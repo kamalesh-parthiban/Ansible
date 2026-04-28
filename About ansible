@@ -214,7 +214,7 @@ authorized_keys
 ansible ip -m ping  --- to test connection to client -m is module
 
 -------------------
-priorities for ansible file
+priorities for ansible cfg file
 
 1) Looks for ansible.cfg file defined in environment variables
 2) Looks for ansible.cfg under the pwd
