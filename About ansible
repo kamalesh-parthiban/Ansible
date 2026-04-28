@@ -187,3 +187,11 @@ config file = /etc/ansible/ansible.cfg
 
  ansible all --list-hosts   -- list all ansible clients
 
+For password less auth
+
+ssh-keygen
+
+/root/.ssh/id_rsa.pub
+
+copy this public key to clients server
+
