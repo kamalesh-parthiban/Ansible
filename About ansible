@@ -195,3 +195,4 @@ ssh-keygen
 
 copy this public key to clients server
 
+ssh-copy-id ip
