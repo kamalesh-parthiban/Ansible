@@ -16,6 +16,14 @@ Problems:
   ✗ no conditions / logic
   ✗ cannot version control properly
 
+What your playbook covers ✅:
+
+hosts
+tasks
+yum module
+service module
+copy module
+
 
 PLAYBOOK
 ──────────────────────────────────────────────────────────
