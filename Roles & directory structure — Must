@@ -132,6 +132,21 @@ Project A's complete playbook.yml:
         name: mysql
         state: started
 ------------------------------------------------------
+What happens when you run this:
+
+ansible-playbook playbook.yml
+        ↓
+pre_tasks  → update yum cache
+        ↓
+roles/nginx/tasks/main.yml  → install + configure nginx
+        ↓
+roles/mysql/tasks/main.yml  → install + configure mysql
+        ↓
+post_tasks → verify both services running
+-----------------------------------------------------
+Ansible automatically finds roles by name from the roles/ folder next to the playbook; you only need to specify a path 
+if roles are stored in a non-default location, which you configure via ansible.cfg or absolute path in the playbook.
+--------------------------------------------------------------------------------------
 
 Under role
 
