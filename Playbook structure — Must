@@ -1,0 +1,89 @@
+Full structure:
+
+---                                    # YAML start
+- name: Setup Web Server               # Play name
+  hosts: webservers                    # target hosts
+  become: yes                          # sudo
+  become_user: root                    # sudo as root
+  gather_facts: yes                    # collect system info
+  vars:                                # variables
+    package_name: nginx
+    http_port: 80
+
+  pre_tasks:                           # runs before tasks
+    - name: update cache
+      apt:
+        update_cache: yes
+
+  tasks:                               # main tasks
+    - name: install nginx
+      yum:
+        name: "{{ package_name }}"
+        state: present
+      tags: install                    # tag
+
+    - name: copy config
+      copy:
+        src: nginx.conf
+        dest: /etc/nginx/
+      notify: restart nginx            # trigger handler
+      tags: config
+
+  post_tasks:                          # runs after tasks
+    - name: verify nginx running
+      service:
+        name: nginx
+        state: started
+
+  handlers:                            # triggered tasks
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+
+-------------------------------------------------
+Execution order:
+------------------
+pre_tasks
+    ↓
+tasks
+    ↓
+handlers (if notified)
+    ↓
+post_tasks
+----------------------------------------
+Multiple plays in one playbook:
+------------------------------------
+---
+- name: Setup Web Server         # Play 1
+  hosts: webservers
+  tasks:
+    - name: install nginx
+      yum:
+        name: nginx
+        state: present
+
+- name: Setup DB Server          # Play 2
+  hosts: dbservers
+  tasks:
+    - name: install mysql
+      yum:
+        name: mysql
+        state: present
+
+--------------------------------------------
+
+Key Fields:
+
+| Field         | Purpose                 | Required?    |
+|--------------|-------------------------|-------------|
+| name         | Play description        | Yes         |
+| hosts        | Target hosts/group      | Yes         |
+| become       | Privilege escalation    | Mostly Yes  |
+| gather_facts | Collect system info     | Default Yes |
+| vars         | Define variables        | Optional    |
+| pre_tasks    | Before main tasks       | Optional    |
+| tasks        | Main work               | Yes         |
+| handlers     | Triggered tasks         | Optional    |
+| post_tasks   | After main tasks        | Optional    |
+| tags         | Selective execution     | Optional    |
