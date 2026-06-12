@@ -60,6 +60,15 @@ Modules (yum, apt, copy, service, file) — Must
     path: /tmp/oldfile
     state: absent         # delete
 
+# Create empty file
+- name: create empty file
+  file:
+    path: /tmp/myfile.txt
+    state: touch          # creates empty file
+    mode: '0644'
+    owner: root
+    group: root
+
 command vs shell:
 
 # command → no shell features (no pipes, no redirects)
