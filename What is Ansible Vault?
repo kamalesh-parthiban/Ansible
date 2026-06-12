@@ -1,0 +1,93 @@
+What is Ansible Vault?
+
+Ansible Vault = Encrypt sensitive data (passwords, API keys, secrets) so they are not stored in plain text.
+
+
+Ansible Vault encrypts sensitive data like passwords and API keys using AES256 encryption so secrets are never stored in plain text. 
+You run playbooks with --ask-vault-pass or --vault-password-file so Ansible can decrypt secrets at runtime.
+
+Why needed?
+
+# Without vault — plain text in vars ❌
+db_password: secret123
+api_key: abcdef123456
+
+# With vault — encrypted ✅
+db_password: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  3233386561...encrypted...
+
+1. Encrypt a file:
+
+# encrypt entire file
+ansible-vault encrypt roles/nginx/vars/main.yml
+
+# asks for vault password
+New Vault password:
+Confirm New Vault password:
+Encryption successful
+
+2. Create new encrypted file:
+
+ansible-vault create secrets.yml
+# opens editor → type secrets → save → file saved encrypted
+
+3. View encrypted file:
+
+ansible-vault view secrets.yml
+# asks vault password → shows decrypted content
+
+4. Edit encrypted file:
+
+ansible-vault edit secrets.yml
+# opens decrypted content in editor → save → re-encrypts
+
+5. Decrypt file:
+
+ansible-vault decrypt secrets.yml
+# converts back to plain text
+
+6. Encrypt single value (inline):
+
+ansible-vault encrypt_string 'secret123' --name 'db_password'
+
+# output:
+db_password: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  3233386561...
+
+7. Run playbook with vault:
+bash
+
+# method 1 — prompt for password
+ansible-playbook playbook.yml --ask-vault-pass
+
+# method 2 — password file
+echo "myvaultpassword" > vault_pass.txt
+ansible-playbook playbook.yml --vault-password-file vault_pass.txt
+
+# method 3 — environment variable
+export ANSIBLE_VAULT_PASSWORD_FILE=vault_pass.txt
+ansible-playbook playbook.yml
+
+Real example (your GlobalPayments context):
+
+# secrets.yml (encrypted with vault)
+db_password: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  encrypted...
+
+ecr_token: !vault |
+  $ANSIBLE_VAULT;1.1;AES256
+  encrypted...
+
+# playbook.yml
+- name: deploy app
+  hosts: appservers
+  vars_files:
+    - secrets.yml        # loads encrypted secrets
+
+  tasks:
+    - name: connect to db
+      shell: mysql -u admin -p{{ db_password }} mydb
+
