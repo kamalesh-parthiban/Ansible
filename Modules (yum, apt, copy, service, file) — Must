@@ -1,0 +1,73 @@
+Modules (yum, apt, copy, service, file) — Must
+
+1. yum (RedHat/CentOS):
+
+- name: install nginx
+  yum:
+    name: nginx
+    state: present      # install
+    # state: absent     # uninstall
+    # state: latest     # upgrade to latest
+
+2. apt (Ubuntu/Debian):
+
+- name: install nginx
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes   # like apt-get update first
+
+3. copy (copy file from control node to remote):
+
+- name: copy config
+  copy:
+    src: nginx.conf           # local machine path
+    dest: /etc/nginx/         # remote machine path
+    owner: root
+    group: root
+    mode: '0644'              # file permissions
+
+4. service (manage services):
+
+- name: start nginx
+  service:
+    name: nginx
+    state: started        # start
+    # state: stopped      # stop
+    # state: restarted    # restart
+    # state: reloaded     # reload
+    enabled: yes          # start on boot
+
+5. file (manage files/directories/symlinks):
+
+# Create directory
+- name: create directory
+  file:
+    path: /etc/nginx/conf.d
+    state: directory      # create dir
+    mode: '0755'
+
+# Create symlink
+- name: create symlink
+  file:
+    src: /etc/nginx/nginx.conf
+    dest: /tmp/nginx-link
+    state: link           # symlink
+
+# Delete file
+- name: delete file
+  file:
+    path: /tmp/oldfile
+    state: absent         # delete
+
+command vs shell:
+
+# command → no shell features (no pipes, no redirects)
+- command: whoami
+
+# shell → full shell features (pipes, redirects, &&)
+- shell: cat /etc/passwd | grep root
+
+Interview answer (2 lines):
+Core Ansible modules are yum/apt for package management, service for managing service state, copy for transferring files, 
+and file for managing file/directory/symlink state. Each module is idempotent — running it multiple times gives same result, only making changes when needed.
