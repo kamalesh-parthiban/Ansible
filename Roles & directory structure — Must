@@ -9,6 +9,13 @@ Simple analogy:
 Playbook = entire recipe book
 Role     = one recipe (nginx, mysql, java)
 
+create a role:
+
+# creates full folder structure automatically
+ansible-galaxy init nginx
+ansible-galaxy init mysql
+ansible-galaxy init java
+
 Role directory structure:
 
 roles/
