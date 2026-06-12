@@ -1,0 +1,194 @@
+Roles & directory structure — Must
+
+What is a Role?
+
+Roles = Way to organize playbook into reusable, structured components.
+
+Simple analogy:
+
+Playbook = entire recipe book
+Role     = one recipe (nginx, mysql, java)
+
+Role directory structure:
+
+roles/
+└── nginx/                    # role name
+    ├── tasks/
+    │   └── main.yml          # main tasks
+    ├── handlers/
+    │   └── main.yml          # handlers
+    ├── vars/
+    │   └── main.yml          # variables
+    ├── defaults/
+    │   └── main.yml          # default variables (lowest priority)
+    ├── templates/
+    │   └── nginx.conf.j2     # jinja2 templates
+    ├── files/
+    │   └── nginx.conf        # static files
+    ├── meta/
+    │   └── main.yml          # role dependencies
+    └── README.md
+
+Each file does:
+
+| Folder              | Purpose                                   |
+|---------------------|-------------------------------------------|
+| tasks/main.yml      | Main tasks to execute                     |
+| handlers/main.yml   | Handlers (notify triggers)                |
+| vars/main.yml       | Role variables (high priority)            |
+| defaults/main.yml   | Default variables (low priority, overridable) |
+| templates/          | Jinja2 template files (.j2)               |
+| files/              | Static files to copy                      |
+| meta/main.yml       | Role dependencies                         |
+
+
+---------------------------------------------------
+
+ansible-project/
+│
+├── project-a/
+│   ├── playbook.yml
+│   ├── inventory/
+│   └── roles:
+│       ├── nginx
+│       └── mysql
+│
+├── project-b/
+│   ├── playbook.yml
+│   ├── inventory/
+│   └── roles:
+│       ├── nginx
+│       └── java
+│
+├── project-c/
+│   ├── playbook.yml
+│   ├── inventory/
+│   └── roles:
+│       ├── nginx
+│       ├── mysql
+│       └── java
+│
+└── roles/
+    ├── nginx/
+    │   ├── tasks/
+    │   └── templates/
+    │
+    ├── mysql/
+    │   ├── tasks/
+    │   └── templates/
+    │
+    └── java/
+        ├── tasks/
+        └── templates/
+
+Role Reuse:
+
+project-a ───────► nginx
+project-a ───────► mysql
+
+project-b ───────► nginx
+project-b ───────► java
+
+project-c ───────► nginx
+project-c ───────► mysql
+project-c ───────► java
+
+Note:
+✓ One shared roles/ directory
+✓ Roles are reused across all projects
+✓ No duplicate role code
+
+---------------
+Project A's complete playbook.yml:
+
+---
+- name: setup project a web server
+  hosts: webservers
+  become: yes
+  become_user: root
+  gather_facts: yes
+
+  vars:
+    env: production
+    app_port: 8080
+
+  pre_tasks:
+    - name: update yum cache
+      yum:
+        update_cache: yes
+
+  roles:
+    - nginx        # calls roles/nginx/tasks/main.yml
+    - mysql        # calls roles/mysql/tasks/main.yml
+
+  post_tasks:
+    - name: verify nginx is running
+      service:
+        name: nginx
+        state: started
+
+    - name: verify mysql is running
+      service:
+        name: mysql
+        state: started
+------------------------------------------------------
+
+Under role
+
+# roles/nginx/tasks/main.yml
+
+- name: install nginx
+  yum:
+    name: "{{ package_name }}"       # picks from defaults/main.yml ✅
+    state: present
+  tags:
+    - install
+
+- name: copy config
+  template:
+    src: nginx.conf.j2
+    dest: "{{ config_path }}/nginx.conf"
+  notify: restart nginx
+  tags:
+    - config
+
+- name: start nginx
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+  tags:
+    - start
+
+
+# roles/nginx/handlers/main.yml
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+
+
+# roles/nginx/defaults/main.yml
+
+package_name: nginx
+http_port: 80
+worker_processes: auto
+
+
+# roles/nginx/vars/main.yml
+
+config_path: /etc/nginx
+log_path: /var/log/nginx
+
+
+# roles/nginx/templates/nginx.conf.j2
+
+worker_processes {{ worker_processes }};
+
+http {
+    server {
+        listen {{ http_port }};
+        server_name {{ ansible_hostname }};
+    }
+}
