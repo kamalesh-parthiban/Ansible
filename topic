@@ -1,0 +1,23 @@
+Core Topics (Must Know):
+
+- What is Ansible, agentless, SSH — Must
+- Inventory (static + dynamic) — Must
+- Playbook structure — Must
+- Modules (yum, apt, copy, service, file) — Must
+- Variables & Facts — Must
+- Handlers — Must
+- Roles & directory structure — Must
+- Tags — Must
+- Conditionals (when) — Must
+- Loops — Must
+
+Intermediate Topics:
+
+- Ansible Vault (secrets) — Must
+- Templates (Jinja2) — Must
+- Dynamic Inventory (AWS EC2) — Must
+- ansible.cfg — Must
+- Error handling (ignore_errors, block/rescue) — Good to know
+- Dry run (--check) — Good to know
+
+Ansible Tower / AWX - ⚠️ Good to know
