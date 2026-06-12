@@ -1,0 +1,46 @@
+Handlers?
+
+Handler is a task that runs only when notified by another task that reported a change — not on every playbook run. 
+It's commonly used for restarting services only when their config file actually changes, avoiding unnecessary restarts.
+
+Handler = Task that runs only when notified (triggered by a change).
+
+Simple analogy:
+
+Doorbell — only rings when someone presses it, not all the time.
+
+Problem without Handler:
+
+tasks:
+  - name: copy config
+    copy:
+      src: nginx.conf
+      dest: /etc/nginx/
+
+  - name: restart nginx
+    service:
+      name: nginx
+      state: restarted   # restarts EVERY time playbook runs
+                         # even if config didn't change ❌
+
+Solution with Handler:
+
+tasks:
+  - name: copy config
+    copy:
+      src: nginx.conf
+      dest: /etc/nginx/
+    notify: restart nginx    # trigger handler only if file changed
+
+handlers:
+  - name: restart nginx
+    service:
+      name: nginx
+      state: restarted       # runs ONLY if config changed ✅
+
+How it works:
+
+Copy config → file changed?
+      ├── YES → notify handler → restart nginx ✅
+      └── NO  → skip handler → no restart ✅
+
