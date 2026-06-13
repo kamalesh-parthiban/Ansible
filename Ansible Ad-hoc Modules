@@ -5,6 +5,9 @@ ansible all -m MODULE -a "ARGUMENTS" -i inventory
 SYSTEM MODULES
 ──────────────────────────────────────────────────────────
 
+All Ansible modules need Python on target:
+Exception — raw module (no Python needed):
+
 ping        → Test connectivity
               ansible all -m ping
 
