@@ -3,6 +3,12 @@ Variables & Facts?
 User-defined values used to make playbooks flexible and reusable instead of hardcoding values. You decide the name and value.
 
 Facts: Automatically collected information about managed hosts (e.g., OS, IP address, hostname).
+
+✅ gather_facts: yes → Default; you don't need to mention it.
+✅ gather_facts: no → Use when you want to skip collecting facts.
+
+gather_facts: yes (the default) is enabled, Ansible collects system information about each managed host before running any tasks.
+
 ---
 - name: Variables Example
   hosts: all
