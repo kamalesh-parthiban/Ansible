@@ -91,3 +91,71 @@ ecr_token: !vault |
     - name: connect to db
       shell: mysql -u admin -p{{ db_password }} mydb
 
+--------------------------
+Practical
+
+Step 1: Create the encrypted vars file
+
+ansible-vault create secrets.yml
+
+It prompts for a password and opens an editor.
+
+Add:
+
+db_password: MySecret123
+
+Example 2: View the encrypted file
+
+ansible-vault view secrets.yml
+
+Example 3: Edit the encrypted file
+
+ansible-vault edit secrets.yml
+
+Example 4: Encrypt an existing file
+
+ansible-vault encrypt secrets.yml
+
+Example 5: Decrypt a file
+
+ansible-vault decrypt secrets.yml
+
+Example 6: Use Vault in a playbook
+
+secrets.yml (encrypted)
+
+db_password: MySecret123
+
+playbook.yml
+
+Even simpler — change hosts: all to hosts: localhost in playbook
+
+---
+- hosts: localhost
+  connection: local
+  vars_files:
+    - secrets.yml
+  tasks:
+    - debug:
+        msg: "Database password is {{ db_password }}"
+
+---
+ansible-playbook play.yml --ask-vault-pass
+-----
+Change vault password
+
+ansible-vault rekey secrets.yml
+---------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
