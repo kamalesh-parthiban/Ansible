@@ -115,3 +115,37 @@ Flag    Meaning
 -b      Become (sudo) — needed for service control
 
 all     Target host group/pattern (or webservers, db01, etc.)
+
+-------------------
+
+Target using patterns
+
+Pattern                 Meaning
+----------------------  -----------------------------------------------
+web*                    All hosts starting with "web"
+
+webservers:dbservers    Union of both groups
+
+webservers:!web03       webservers group EXCLUDING web03
+
+webservers:&staging     Intersection — in both groups
+
+all:!dbservers          All hosts except dbservers group
+
+-------------------------------------------
+Example inventory file (inventory.ini)
+
+[webservers]
+web01 ansible_host=192.168.1.10
+web02 ansible_host=192.168.1.11
+
+[dbservers]
+db01 ansible_host=192.168.1.20
+
+Target a specific group (defined in inventory)
+
+ansible webservers -m systemd -a "name=nginx state=restarted" -b
+
+or by inventory hostname:
+
+ansible web01 -m systemd -a "name=nginx state=started" -b
