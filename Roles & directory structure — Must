@@ -2,7 +2,7 @@ Roles & directory structure — Must
 
 What is a Role?
 
-Roles = Way to organize playbook into reusable, structured components.
+Roles = is a standardized directory structure that packages related tasks, variables, handlers, templates are reusable across all projects.
 
 Simple analogy:
 
