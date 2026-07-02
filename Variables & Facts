@@ -1,0 +1,138 @@
+Variables & Facts?
+
+User-defined values used to make playbooks flexible and reusable instead of hardcoding values. You decide the name and value.
+
+Facts: Automatically collected information about managed hosts (e.g., OS, IP address, hostname).
+---
+- name: Variables Example
+  hosts: all
+
+  vars:
+    package_name: nginx
+
+  tasks:
+    - name: Install package
+      package:
+        name: "{{ package_name }}"
+        state: present
+
+Here, package_name is a user-defined variable.
+
+--------------------------
+Facts Example
+
+---
+- name: Facts Example
+  hosts: all
+
+  tasks:
+    - name: Display hostname
+      debug:
+        msg: "Hostname is {{ ansible_hostname }}"
+
+    - name: Display OS
+      debug:
+        msg: "OS is {{ ansible_distribution }}"
+
+Here, ansible_hostname and ansible_distribution are facts automatically collected by Ansible.
+
+Examples of common Ansible facts
+
+| Fact                           | Description            | Example Value               |
+| ------------------------------ | ---------------------- | --------------------------- |
+| `ansible_hostname`             | Hostname of the server | `web01`                     |
+| `ansible_distribution`         | Operating system name  | `Ubuntu`, `Rocky`, `CentOS` |
+| `ansible_distribution_version` | OS version             | `22.04`, `9.3`              |
+| `ansible_default_ipv4.address` | Primary IP address     | `192.168.1.10`              |
+| `ansible_architecture`         | CPU architecture       | `x86_64`                    |
+| `ansible_processor_vcpus`      | Number of vCPUs        | `4`                         |
+| `ansible_memtotal_mb`          | Total RAM (MB)         | `8192`                      |
+
+
+debug is a built-in Ansible module.
+
+It is used to display variables, facts, or custom messages during playbook execution.
+
+Example 1: Print a message
+
+- name: Print message
+  debug:
+    msg: "Hello, World!"
+
+Output:
+
+ok: [server1] => {
+    "msg": "Hello, World!"
+}
+
+--
+If hosts: all contains 5 servers, Ansible runs the tasks on each server and shows the output for each one.
+
+For example, if your inventory is:
+
+web1
+web2
+db1
+db2
+app1
+
+And their hostnames/OS are:
+
+| Server | Hostname | OS     |
+| ------ | -------- | ------ |
+| web1   | web1     | Ubuntu |
+| web2   | web2     | Ubuntu |
+| db1    | db1      | Rocky  |
+| db2    | db2      | Rocky  |
+| app1   | app1     | CentOS |
+
+
+The output would look similar to:
+
+TASK [Display hostname] ************************************************
+
+ok: [web1] => {
+    "msg": "Hostname is web1"
+}
+
+ok: [web2] => {
+    "msg": "Hostname is web2"
+}
+
+ok: [db1] => {
+    "msg": "Hostname is db1"
+}
+
+ok: [db2] => {
+    "msg": "Hostname is db2"
+}
+
+ok: [app1] => {
+    "msg": "Hostname is app1"
+}
+
+TASK [Display OS] ******************************************************
+
+ok: [web1] => {
+    "msg": "OS is Ubuntu"
+}
+
+ok: [web2] => {
+    "msg": "OS is Ubuntu"
+}
+
+ok: [db1] => {
+    "msg": "OS is Rocky"
+}
+
+ok: [db2] => {
+    "msg": "OS is Rocky"
+}
+
+ok: [app1] => {
+    "msg": "OS is CentOS"
+}
+
+
+
+
