@@ -86,3 +86,32 @@ state=restarted → restart service
 state=directory → create directory
 state=file      → ensure it is a file
 state=touch     → touch the file
+---------------------------
+
+# Start
+ansible all -m systemd -a "name=nginx state=started" -b
+
+# Stop
+ansible all -m systemd -a "name=nginx state=stopped" -b
+
+# Restart
+ansible all -m systemd -a "name=nginx state=restarted" -b
+
+# Enable + start
+ansible all -m systemd -a "name=nginx state=started enabled=yes" -b
+
+# Daemon reload (after editing unit files)
+ansible all -m systemd -a "daemon_reload=yes" -b
+
+------
+Flags explained
+
+Flag    Meaning
+----    ---------------------------------------------------------
+-m      Module (service or systemd)
+
+-a      Arguments passed to module
+
+-b      Become (sudo) — needed for service control
+
+all     Target host group/pattern (or webservers, db01, etc.)
