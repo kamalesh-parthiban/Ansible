@@ -3,6 +3,7 @@ Roles & directory structure — Must
 What is a Role?
 
 Roles = is a standardized directory structure that packages related tasks, variables, handlers, templates are reusable across all projects.
+so you can plug the same functionality (e.g. "install nginx") into any playbook without rewriting it.
 
 Simple analogy:
 
